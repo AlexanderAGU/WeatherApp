@@ -9,19 +9,72 @@ from customtkinter import *
 class WeatherApp:
 
     def __init__(self):
-        app = CTk()
-        app.geometry("500x400")
+        self.app = CTk()
+        self.app.geometry("500x400")
+        self.app.title("Weather App")
+
         set_appearance_mode("dark")
-        self.btn = CTkButton(master=app, text="Check the weather", corner_radius=32,)
-        self.btn.place(relx=0.5, rely=0.5, anchor="center")
-        self.result_label = CTkLabel(master=app,text="Weather", font=("Arial", 20) )
-        self.result_label.place(relx=0.4, rely=0.3, anchor="nw")
-        self.entry = CTkEntry(master=app, placeholder_text="Type the place to check weather",width=300)
-        self.entry.place(relx=.2, rely=.7, anchor="sw")
-        app.mainloop()
-    
-    
-    
+
+        # Makes the window resizable
+        self.app.grid_rowconfigure(0, weight=1)
+        self.app.grid_columnconfigure(0, weight=1)
+
+        # Main frame
+        self.frame = CTkFrame(master=self.app, fg_color="#423A8D")
+        self.frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+
+        # Center contents inside frame
+        self.frame.grid_rowconfigure((0, 1, 2), weight=1)
+        self.frame.grid_columnconfigure(0, weight=1)
+
+        # Label
+        self.result_label = CTkLabel(
+            master=self.frame,
+            text="Forecast",
+            font=("Arial", 45)
+        )
+        self.result_label.grid(row=0, column=0, pady=20)
+
+        # Entry
+        self.city_entry = CTkEntry(
+            master=self.frame,
+            placeholder_text="Type the place to check weather",
+            width=300
+        )
+        self.city_entry.grid(row=1, column=0, pady=10)
+
+        # Button
+        self.btn = CTkButton(
+            master=self.frame,
+            text="Check the weather",
+            corner_radius=90,
+            command=self.get_weather   
+        )
+        self.btn.grid(row=2, column=0, pady=20)
+
+        self.app.mainloop()
+        
+    def get_weather(self):
+        city_name = self.city_entry.get()
+
+        api_key = "9bc2274e2ab8379ec64b7e2d9adb233e"
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}&units=imperial"
+
+        response = requests.get(url)
+        data = response.json()
+        if data["cod"] != 200:
+            self.result_label.configure(text="City not found, please try again")
+            return
+        temperature = data["main"]["temp"]
+        description = data["weather"][0]["description"]
+        
+        self.result_label.configure(
+            text=f"The forecast for {city_name}: {temperature}°F, {description}"
+        )
+
+WeatherApp()
+
+
     # def __init__(self):
     #     self.root = Tk()
     #     self.root.title("Weather App") # Need to set proper griding to make app look nice.
@@ -34,21 +87,3 @@ class WeatherApp:
     #     self.result_label = ttk.Label(mainframe, text="Resut")
     #     self.result_label.grid(column=0, row=2, sticky=W)
     #     self.root.mainloop()
-        
-    # def get_weather(self):
-    #     # city_name = self.city_entry.get()
-
-    #     api_key = "9bc2274e2ab8379ec64b7e2d9adb233e"
-    #     url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}&units=imperial"
-
-    #     response = requests.get(url)
-    #     data = response.json()
-
-    #     temperature = data["main"]["temp"]
-    #     description = data["weather"][0]["description"]
-
-    #     self.result_label.config(
-    #         text=f"{city_name}: {temperature}°F, {description}"
-    #     )
-
-WeatherApp()
