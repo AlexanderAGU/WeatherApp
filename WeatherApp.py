@@ -68,9 +68,12 @@ class WeatherApp:
         temperature = data["main"]["temp"]
         description = data["weather"][0]["description"]
         
+        print(self)
+
         self.result_label.configure(
             text=f"The forecast for {city_name}: {temperature}°F, {description}"
         )
+
 
 WeatherApp()
 
